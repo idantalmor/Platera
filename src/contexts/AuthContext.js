@@ -7,12 +7,13 @@ import {
 } from "firebase/auth";
 import { auth } from "../firebase";
 
+
 const UserContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState({});
-  const createUser = (email, password) => {
-    return createUserWithEmailAndPassword(auth, email, password);
+  const createUser =  (email, password, uuid) => {
+    return createUserWithEmailAndPassword(auth, email, password)
   };
   const logout = () => {
     return signOut(auth);
