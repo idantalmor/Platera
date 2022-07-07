@@ -1,19 +1,35 @@
-import React from 'react'
-import { Card } from "react-bootstrap";
+import * as React from 'react';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import Divider from '@mui/material/Divider';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Avatar from '@mui/material/Avatar';
+import Typography from '@mui/material/Typography';
 
-const SingleChat = ({id, dateCreated, name,members}) => {
+export default function SingleChat({id, dateCreated,name,members}) {
   return (
-    <div>
-        <Card style={{padding:'5%', margin: '5%'}}>
-            <div style={{display:'flex', flexDirection:'row', justifyContent:'space-around'}}>
-                <h3>{name}</h3>
-                <h4>{members.length} משתתפים</h4>
-            </div>
-                <h5>{dateCreated.substring(0,16)}</h5>
-        </Card>
-      
-    </div>
-  )
-}
 
-export default SingleChat
+      <ListItem alignItems="flex-start">
+        <ListItemAvatar>
+          <Avatar alt="Remy Sharp" src="/static/images/avatar/3.jpg" />
+        </ListItemAvatar>
+        <ListItemText
+          primary={name}
+          secondary={
+            <React.Fragment>
+              <Typography
+                sx={{ display: 'inline' }}
+                component="span"
+                variant="body2"
+                color="text.primary"
+              >
+                {members.length} members
+              </Typography>
+              - {dateCreated.substring(0,16)}
+            </React.Fragment>
+          }
+        />
+      </ListItem>
+  );
+}

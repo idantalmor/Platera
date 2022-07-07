@@ -23,25 +23,27 @@ const style = {
   p: 4,
 };
 
-export default function BasicModal() {
-   
+export default function BasicModal({ getChatFromUser }) {
   const { user } = UserAuth();
   const email = user.email;
   const [nameChat, setNameChat] = useState("");
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState("");
   const handleClose = () => {
     setOpen(false);
     setMembers([{ id: user.uid, email: email }]);
     setNameChat("");
+    getChatFromUser()
   };
   const [members, setMembers] = useState([{ id: user.uid, email: email }]);
   const [data, setData] = useState([]);
-  const uuid = uid()
+  const uuid = uid();
 
   const handleOpen = () => {
     setOpen(true);
   };
 
+  //Add user to Member array, if exist the function will remove member
   const addToMember = (user) => {
     const newMember = { id: user.id, email: user.email };
     const isFound = members.some((element) => {
@@ -58,18 +60,22 @@ export default function BasicModal() {
     }
   };
 
-  const HandleNewChat = async () =>{
-    const current = new Date().toUTCString()
-    console.log(current)
-    await set(ref(db, `/chats/${uuid}`), {
-      id: uuid,
-      name: nameChat,
-      members: members,
-      dateCreated: current
-    })
-    handleClose()
-  }
-
+  const HandleNewChat = async () => {
+    const current = new Date().toUTCString();
+    console.log(current);
+    try {
+      await set(ref(db, `/chats/${uuid}`), {
+        id: uuid,
+        name: nameChat,
+        members: members,
+        dateCreated: current,
+        admin: {adminId: user.uid, nameAdmin: user.email}
+      });
+    } catch (error) {
+      setError("error");
+    }
+    handleClose();
+  };
 
   useEffect(() => {
     setData([]);
@@ -113,11 +119,17 @@ export default function BasicModal() {
                   color="success"
                   onClick={() => addToMember(user)}
                 />
-                <h3>{user.email}</h3>
+                <h3>{user.email.split('@')[0]}</h3>
               </div>
             </div>
           ))}
-          <div style={{display:'flex', justifyContent:'center', marginTop:'5%'}}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "5%",
+            }}
+          >
             <h3>Total Members: {members.length}</h3>
           </div>
           <div
@@ -128,7 +140,10 @@ export default function BasicModal() {
             }}
           >
             <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={HandleNewChat}>Create Chat</Button>
+            <div>
+              <Button onClick={HandleNewChat}>Create Chat</Button>
+              {error && <h3>{error}</h3>}
+            </div>
           </div>
         </Box>
       </Modal>

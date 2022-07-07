@@ -9,7 +9,9 @@ import { Container } from "react-bootstrap";
 import LoginScreen from "./screens/LoginScreen/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen/RegisterScreen";
 import HomeScreen from "./screens/HomeScreen/HomeScreen";
+import ChatScreen from "./screens/ChatScreen/ChatScreen";
 import { AuthContextProvider } from "./contexts/AuthContext";
+
 
 function App() {
   return (
@@ -18,10 +20,11 @@ function App() {
       <main className="py-3">
         <Container>
             <Routes>
-              <Route path="/" element={<Navigate to="/login" />} />
+              <Route path="/" element={ <Navigate to="/login" />} />
               <Route path="/login" element={<LoginScreen />} />
               <Route path="/register" element={<RegisterScreen />} />
               <Route path="/home" element={<HomeScreen />} />
+              <Route path="/chat/:id" element={<ChatScreen />} />
             </Routes>
         </Container>
       </main>
