@@ -13,6 +13,7 @@ import { set, ref, onValue, get, getDatabase, update } from "firebase/database";
 import SendIcon from "@mui/icons-material/Send";
 import ComposedTextField from "../LoginScreen/components/ComposedTextField";
 import { UserAuth } from "../../contexts/AuthContext";
+import { Spinner } from "react-bootstrap";
 
 const ChatScreen = () => {
   const navigate = useNavigate();
@@ -20,12 +21,13 @@ const ChatScreen = () => {
   const chatId = params.id;
   const { user } = UserAuth();
   const [currentChat, setCurrentChat] = useState({});
-  // const [allMessages, setAllMessages] = useState([])
-  const [message, setMessage] = useState("");
-  const [refresh, setRefresh] = useState(false);
   const [allMessages, setAllMessages] = useState([]);
-  const [firstReload, setFirstReload] = useState(true);
-  const [reloadAllMessages, setReloadAllMessages] = useState(false)
+  const [numberMessages, setNumberMessages] = useState(0)
+  const [message, setMessage] = useState("");
+  const [refresh, setRefresh] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [checkNewMessage, setCheckNewMessage] = useState(false);
+
 
   useEffect(() => {
     if (!user) {
@@ -35,45 +37,7 @@ const ChatScreen = () => {
     }
   }, [user]);
 
-  useEffect(() => {
-      ReadAllMessages();
-    console.log("the db was Changed")
-  }, [db])
-  
-
-  useEffect(() => {
-    if (!refresh) {
-      addToDataBase();
-    }
-    
-  }, [allMessages, refresh]);
-
-  useEffect(() => {
-    if (firstReload) {
-      setAllMessages('')
-      ReadAllMessages();
-    }
-  }, [firstReload]);
-
-  const ReadAllMessages = () => {
-    console.log(allMessages)
-    let tempArray = [];
-    onValue(ref(db, `/chats/${chatId}/messages`), (snapshot) => {
-      const myData = snapshot.val();
-      // console.log(myData)
-      if (myData != null) {
-        Object.values(myData).map((contact) => {
-          const message = contact
-          tempArray.push(message)
-        });
-      }
-    });
-    setAllMessages(tempArray);
-    setFirstReload(false)
-  };
-
-
-
+  //Get the details of this chat
   const getCurrentChat = () => {
     onValue(ref(db, `/chats/${chatId}`), (snapshot) => {
       const myData = snapshot.val();
@@ -91,10 +55,44 @@ const ChatScreen = () => {
     });
   };
 
-  const addToDataBase = () => {
-    console.log("all Messages:" + allMessages);
+
+  useEffect(() => {
+    if (refresh) {
+      ReadAllMessages()
+    }
+  },[allMessages, refresh]);
+
+  useEffect(() => {
+    setNumberMessages(allMessages.length)
+  })
+  
+
+  useEffect(() => {
+    setRefresh(true)
+  },[numberMessages])
+  
+
+
+  const ReadAllMessages = () => {
+    let tempArray = [];
+    setAllMessages('')
+    onValue(ref(db, `/chats/${chatId}/messages`), (snapshot) => {
+      const myData = snapshot.val();
+      // console.log(myData)
+      if (myData != null) {
+        Object.values(myData).map((contact) => {
+          const message = contact
+          tempArray.push(message)
+        });
+      }
+    });
+    setAllMessages(tempArray);
+    setRefresh(false)
+  };
+
+  const addToDataBase = async () => {
     try {
-      set(ref(db, `/chats/${chatId}`), {
+      await set(ref(db, `/chats/${chatId}`), {
         id: currentChat.id,
         name: currentChat.name,
         members: currentChat.members,
@@ -108,15 +106,19 @@ const ChatScreen = () => {
     } catch (error) {
       console.log("error");
     }
-    setRefresh(true);
-    setFirstReload(true)
+    setCheckNewMessage(false)
   };
 
+  useEffect(() => {
+    if(checkNewMessage){
+      addToDataBase()
+    }
+  }, [allMessages, checkNewMessage])
+  
 
-  const handleUpdateNewMessage = async () => {
-    setRefresh(false);
-    let tempArray = allMessages
-    console.log(tempArray)
+
+  const handleUpdateNewMessage = () => {
+    setCheckNewMessage(false)
     const uuid = uid();
     let today = new Date(),
       time =
@@ -129,6 +131,7 @@ const ChatScreen = () => {
     };
     setAllMessages([...allMessages, newMessage]);
     setMessage("");
+    setCheckNewMessage(true)
   };
 
   return (
@@ -142,6 +145,11 @@ const ChatScreen = () => {
             />
           </div>
         </Card>
+        {refresh && (
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        )}
         <Box>
           <div
             style={{
