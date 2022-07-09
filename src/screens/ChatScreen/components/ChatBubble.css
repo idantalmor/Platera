@@ -1,0 +1,13 @@
+.head-text {
+    position: relative;
+ }
+ .card {
+   position: absolute;
+   right: 0%;
+   left: 10%;
+   bottom: 30%;
+   top:45%;
+   color:white;
+   font-size: 22px;
+   font-family:'Courier New', Courier, monospace
+ }

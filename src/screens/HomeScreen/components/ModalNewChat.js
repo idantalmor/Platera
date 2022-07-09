@@ -10,6 +10,7 @@ import { db } from "../../../firebase";
 import { uid } from "uid";
 import { set, ref, onValue, get, getDatabase } from "firebase/database";
 import ComposedTextField from "../../LoginScreen/components/ComposedTextField";
+import { Spinner } from "react-bootstrap";
 
 const style = {
   position: "absolute",
@@ -28,12 +29,13 @@ export default function BasicModal({ getChatFromUser }) {
   const email = user.email;
   const [nameChat, setNameChat] = useState("");
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState("");
   const handleClose = () => {
     setOpen(false);
     setMembers([{ id: user.uid, email: email }]);
     setNameChat("");
-    getChatFromUser()
+    getChatFromUser();
   };
   const [members, setMembers] = useState([{ id: user.uid, email: email }]);
   const [data, setData] = useState([]);
@@ -41,6 +43,27 @@ export default function BasicModal({ getChatFromUser }) {
 
   const handleOpen = () => {
     setOpen(true);
+  };
+
+  useEffect(() => {
+    setData([]);
+    getAllUsers()
+  }, []);
+
+  const getAllUsers = () => {
+    setLoading(true)
+    let tempArray = []
+    onValue(ref(db, `/users`), (snapshot) => {
+      const myData = snapshot.val();
+      if (myData != null) {
+        Object.values(myData).map((contact) => {
+          const user = { id: contact.id, email: contact.email };
+          tempArray.push(user)
+        });
+      }
+    });
+    setLoading(false)
+    setData(tempArray);
   };
 
   //Add user to Member array, if exist the function will remove member
@@ -69,7 +92,7 @@ export default function BasicModal({ getChatFromUser }) {
         name: nameChat,
         members: members,
         dateCreated: current,
-        admin: {adminId: user.uid, nameAdmin: user.email}
+        admin: { adminId: user.uid, nameAdmin: user.email },
       });
     } catch (error) {
       setError("error");
@@ -77,18 +100,7 @@ export default function BasicModal({ getChatFromUser }) {
     handleClose();
   };
 
-  useEffect(() => {
-    setData([]);
-    onValue(ref(db, `/users`), (snapshot) => {
-      const myData = snapshot.val();
-      if (myData != null) {
-        Object.values(myData).map((contact) => {
-          const user = { id: contact.id, email: contact.email };
-          setData((oldArray) => [...oldArray, user]);
-        });
-      }
-    });
-  }, []);
+
 
   return (
     <div>
@@ -110,6 +122,11 @@ export default function BasicModal({ getChatFromUser }) {
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             Who to join the chat with?
           </Typography>
+          {loading && (
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        )}
           {data?.map((user) => (
             <div>
               <div style={{ display: "flex", flexDirection: "row" }}>
@@ -119,7 +136,7 @@ export default function BasicModal({ getChatFromUser }) {
                   color="success"
                   onClick={() => addToMember(user)}
                 />
-                <h3>{user.email.split('@')[0]}</h3>
+                <h3>{user.email.split("@")[0]}</h3>
               </div>
             </div>
           ))}

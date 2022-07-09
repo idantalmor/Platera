@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Title from "../../components/Title";
 import Button from "../../components/Button";
 import Button2 from "@mui/material/Button";
@@ -11,7 +11,7 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const {signIn} = UserAuth();
+  const {user, signIn} = UserAuth();
   const handleSignIn = async () =>{
       setError('')
       try {
@@ -25,6 +25,13 @@ const LoginScreen = () => {
         
       }
   }
+
+  useEffect(() => {
+    if(user){
+      navigate('/home')
+    }
+  }, )
+  
 
   return (
     <div>

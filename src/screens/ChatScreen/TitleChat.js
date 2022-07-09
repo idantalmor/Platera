@@ -3,11 +3,8 @@ import React from "react";
 import { UserAuth } from "../../contexts/AuthContext";
 
 const TitleChat = ({ admin, dateCreated }) => {
-  console.log(admin);
   const { user } = UserAuth();
   const uid = user.uid;
-  console.log(uid);
-
   return (
     <>
     <div style={{display:'flex', justifyContent:'center', flexDirection:'column'}}>

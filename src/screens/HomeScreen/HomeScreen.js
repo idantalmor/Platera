@@ -5,12 +5,13 @@ import ModalNewChat from "./components/ModalNewChat";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
-import Divider from '@mui/material/Divider';
+import Divider from "@mui/material/Divider";
 import { UserAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../firebase";
-import { set, ref, onValue } from "firebase/database";
+import { set, ref, onValue, remove } from "firebase/database";
 import SingleChat from "./components/SingleChat";
+import { Spinner } from "react-bootstrap";
 
 const HomeScreen = () => {
   const [chats, setChats] = useState([]);
@@ -18,6 +19,7 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(false);
   const uid = user.uid;
   const navigate = useNavigate();
+  const email = user.email;
 
   //Add user to FireStore in firstTime
   const addToDatabase = async () => {
@@ -28,10 +30,15 @@ const HomeScreen = () => {
   };
   //get all chat of this user
   useEffect(() => {
-    getChatFromUser();
-  }, []);
+    getChatsFromUser();
+  }, [chats]);
 
-  const getChatFromUser = async () => {
+  const removeAll = () => {
+    remove(ref(db, `/chats`));
+  };
+
+  const getChatsFromUser = async () => {
+    setLoading(true)
     let tempArray = [];
     onValue(ref(db, `/chats`), (snapshot) => {
       const myData = snapshot.val();
@@ -55,6 +62,7 @@ const HomeScreen = () => {
           }
         });
       }
+      setLoading(false)
     });
     setChats(tempArray);
   };
@@ -86,15 +94,18 @@ const HomeScreen = () => {
           flexDirection: "column",
         }}
       >
-        <h1>Welcome, {user && user.email.split('@')[0]}</h1>
+        <h1>Welcome, {user && email}</h1>
+        {loading && (
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        )}
         <Title name="MY CHATS" />
         <List>
           {chats?.map((chat) => (
             <>
               <ListItem key={chat.id}>
-                <ListItemButton
-                  onClick={() => navigate(`/chat/${chat.id}`)}
-                >
+                <ListItemButton onClick={() => navigate(`/chat/${chat.id}`)}>
                   <SingleChat
                     id={chat.id}
                     dateCreated={chat.dateCreated}
@@ -114,7 +125,10 @@ const HomeScreen = () => {
         >
           Log out
         </Button2>
-        <ModalNewChat getChatFromUser={getChatFromUser} />
+        <Button2 onClick={() => removeAll()} variant="contained" size={"large"}>
+          remove
+        </Button2>
+        <ModalNewChat getChatFromUser={getChatsFromUser} />
       </div>
     </div>
   );
