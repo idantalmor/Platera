@@ -21,12 +21,15 @@ const RegisterScreen = () => {
     setLoading(true);
     setError("");
     if (!email || !password || !validPassword) {
+      setLoading(false);
       return setError("Empty Field Error");
     }
     if (password != validPassword) {
+      setLoading(false);
       return setError("The password are not equal");
     }
     if (password.length < 6) {
+      setLoading(false);
       return setError("The password must be longer than 6 letters");
     }
     try {
@@ -34,13 +37,19 @@ const RegisterScreen = () => {
       navigate("/login");
     } catch (error) {
       setError("Please Check Again");
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
     <>
-      <Card>
+      <Card
+          style={{
+            backgroundImage: "linear-gradient(to right, #BABABA, #F3F3F3)",
+            padding: 20,
+            border: '3px solid black'
+          }}
+        >
         <div>
           <div
             style={{
@@ -56,21 +65,24 @@ const RegisterScreen = () => {
               type={"Email"}
               value={email}
               setValue={setEmail}
+              style={'basic'}
             />
             <ComposedTextField
               text={"Enter Password"}
               type={"password"}
               value={password}
               setValue={setPassword}
+              style={'basic'}
             />
             <ComposedTextField
               text={"Password Confirmation"}
               type={"password"}
               value={validPassword}
               setValue={setValidPassword}
+              style={'basic'}
             />
             <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
-              <div style={{marginBottom:'10%'}}>
+              <div style={{padding: 10}}>
             <Button2
               onClick={() => handleSubmit()}
               variant="contained"
@@ -80,15 +92,6 @@ const RegisterScreen = () => {
             </Button2>
               </div>
               <div>
-            {/* <Button2
-              onClick={() => console.log('gmail')}
-              variant="contained"
-              size={"large"}
-            >
-              <GoogleIcon/> | Sign in with Google 
-            </Button2> */}
-
-
               </div>
             </div>
             {loading && (
@@ -97,7 +100,6 @@ const RegisterScreen = () => {
               </Spinner>
             )}
             {error && <h2>{error}</h2>}
-            {/* <Button type={"Back to Login"} text={"Register"} size={"large"} onClick={'Register'} /> */}
           </div>
         </div>
       </Card>

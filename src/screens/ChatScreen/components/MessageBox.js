@@ -49,27 +49,31 @@ const MessageBox = ({ text, whoSend, createdAt }) => {
           </>
         ) : (
           <>
-            <h5 style={{ fontSize: "14px", color: "black" }}></h5>
+          <div style={lengthMessage > 18 ? {display:'flex', marginLeft:'20%', alignItems:'center'} : {display:'flex', marginLeft:'60%', alignItems:'center'}}>
+                <h5
+                      style={{
+                        fontSize: "10px",
+                        border: "1px solid black",
+                        padding: 4,
+                        borderRadius: 10,
+                        color: "black",
+                        height: 20,
+                      }}
+                    >
+                      {" "}
+                      {createdAt}{" "}
+                    </h5>
             <Box
               sx={{
                 width: lengthMessage > 8 ? lengthMessage * 10 : 100,
-                height: 70,
-                backgroundColor: "white",
+                height: 50,
+                backgroundColor: 'white',
                 marginBottom: 5,
-                borderRadius: 10,
-                marginLeft: "80%",
+                borderRadius: 30,
               }}
             >
-              <div style={{ padding: "10%" }}>
+              <div style={{ padding: "5%", display:'flex' }}>
                 <div
-                  style={{
-                    display: "flex",
-                  }}
-                ></div>
-                <div
-                  style={{
-                    display: "flex",
-                  }}
                 >
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     <h3 style={{ fontSize: "8px", color: "red" }}>
@@ -88,21 +92,11 @@ const MessageBox = ({ text, whoSend, createdAt }) => {
                     textAlign: "center",
                   }}
                 >
-                  <h5
-                    style={{
-                      fontSize: "10px",
-                      border: "1px solid black",
-                      padding: 4,
-                      borderRadius: 10,
-                      color: "black",
-                    }}
-                  >
-                    {" "}
-                    {createdAt}{" "}
-                  </h5>
+                
                 </div>
               </div>
             </Box>
+          </div>
           </>
         )}
       </div>

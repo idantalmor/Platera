@@ -7,11 +7,11 @@ const DetailsChat = ({ name, members }) => {
         <h1 style={{ fontWeight: "bold" }}>{name}</h1>
       </div>
       <h3 style={{ textDecorationLine: "underline" }}>Group Members:</h3>
-      <div style={{ display: "flex", flexDirection: "row" }}>
+      <div style={{ display: "flex", flexDirection: 'column' }}>
         {members?.map((member, index) => (
           <div key={member.id}>
             {members[index + 1] ? (
-              <h4>{member.email} , </h4>
+              <h4>{member.email}</h4>
             ) : (
               <h4>{member.email}</h4>
             )}

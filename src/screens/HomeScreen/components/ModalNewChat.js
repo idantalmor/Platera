@@ -22,12 +22,12 @@ const style = {
   border: "2px solid #000",
   boxShadow: 24,
   p: 4,
+  borderRadius:10
 };
 
 export default function BasicModal({ getChatFromUser }) {
   const { user } = UserAuth();
-  const email = user.email;
-  const displayName = user.displayName
+  const email = user?.email;
   const [nameChat, setNameChat] = useState("");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false)
@@ -40,7 +40,7 @@ export default function BasicModal({ getChatFromUser }) {
     setNameChat("");
     getChatFromUser();
   };
-  const [members, setMembers] = useState([{ id: user.uid, email: email ? email : user.displayName }]);
+  const [members, setMembers] = useState([{ id: user?.uid, email: email ? email : user?.displayName }]);
   const [data, setData] = useState([]);
   const uuid = uid();
 
@@ -53,6 +53,7 @@ export default function BasicModal({ getChatFromUser }) {
   }, []);
 
   const checkCurrentUser = (displayName,email) => {
+    console.log(email)
       if (email){
         if(email === user.email){
           return true;
@@ -68,6 +69,11 @@ export default function BasicModal({ getChatFromUser }) {
       }
   }
 
+  // useEffect(() => {
+    
+  // }, [data])
+  
+
 
   const getAllUsers = () => {
     setLoading(true)
@@ -79,7 +85,10 @@ export default function BasicModal({ getChatFromUser }) {
           const user = { id: contact.id, email: contact.email };
           tempArray.push(user)
         });
+        console.log(tempArray)
       }
+      tempArray.sort((a, b) => (a.email > b.email) ? 1 : -1)
+      console.log(tempArray)
     });
     setLoading(false)
     setData(tempArray);
@@ -141,6 +150,7 @@ export default function BasicModal({ getChatFromUser }) {
             text={"Enter Name Group"}
             value={nameChat}
             setValue={setNameChat}
+            style={'basic'}
           />
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             Who to join the chat with?
@@ -159,18 +169,20 @@ export default function BasicModal({ getChatFromUser }) {
               overflowY: "scroll",
               flexDirection: "column",
               borderRadius: 20,
+              padding: 10,
             }}
           >
-          {data?.map((user) => (
-            <div key={user.id}>
+          {data?.map((currentUser) => (
+            <div key={currentUser.id}>
               <div style={{ display: "flex", flexDirection: "row" }}>
+
                 <Checkbox
                   defaultChecked={false}
-                  disabled={checkCurrentUser(user.email,user.displayName)}
+                  disabled={user?.email ? (currentUser.email === user?.email) : (currentUser.email === user?.displayName)}
                   color="success"
-                  onClick={() => addToMember(user)}
+                  onClick={() => addToMember(currentUser)}
                 />
-                <h3 style={{ fontSize: "25px", color: "black" }}>{(user.email) ? (user.email.split("@")[0]) : (user.displayName)}</h3>
+                <h3 style={{ fontSize: "25px", color: "black" }}>{(currentUser.email) ? (currentUser.email.split("@")[0]) : (user.displayName)}</h3>
               </div>
             </div>
           ))}
@@ -194,7 +206,7 @@ export default function BasicModal({ getChatFromUser }) {
           >
             <Button onClick={handleClose}>Cancel</Button>
             <div>
-              <Button onClick={HandleNewChat}>Create Chat</Button>
+              <Button onClick={HandleNewChat} disabled={nameChat.length < 3}>Create Chat</Button>
               {error && <h3>{error}</h3>}
             </div>
           </div>

@@ -6,6 +6,8 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 
 export default function ComposedTextField({type, text, value, setValue, style}) {
 
+
+
   const handleChange = (event) => {
     setValue(event.target.value);
   };
@@ -27,7 +29,7 @@ export default function ComposedTextField({type, text, value, setValue, style}) 
           type={type === 'password' && 'password'}
           onChange={handleChange}
           label="Email"
-          style={style && {backgroundColor:'#D5D0D0', width:500, height: 100}}
+          style={style === 'basic' ? {backgroundColor:'#CFC4E8'} : {backgroundColor:'#D5D0D0', width:300, height: 100}}
         />
       </FormControl>
     </Box>

@@ -11,48 +11,48 @@ import { useNavigate } from "react-router-dom";
 import { db } from "../../firebase";
 import { set, ref, onValue, remove } from "firebase/database";
 import SingleChat from "./components/SingleChat";
-import { Spinner } from "react-bootstrap";
+import { Spinner, Card } from "react-bootstrap";
 
 const HomeScreen = () => {
   const [chats, setChats] = useState([]);
   const { user, logout } = UserAuth();
   const [loading, setLoading] = useState(false);
-  const [FirstReload,setFirstReload] = useState(true)
+  const [FirstReload, setFirstReload] = useState(true);
   const uid = user?.uid;
   const navigate = useNavigate();
-  const email = user.email;
+  console.log(user);
 
   //Add user to FireStore in firstTime
   const addToDatabase = async () => {
-    let name = user.email
-    if(!name){
-      name = user.displayName
+    let name = user?.email;
+    if (!name) {
+      name = user?.displayName;
     }
-    console.log(uid, name)
+    console.log(uid, name);
     try {
       await set(ref(db, `/users/${uid}`), {
         id: uid,
         email: name,
       });
     } catch (error) {
-      console.log('error')
-      
+      console.log("error");
     }
   };
+
+  useEffect(() => {
+    if(user === null){
+      navigate('/login')
+     }
+  }, [user])
+  
+
   //get all chat of this user
   useEffect(() => {
-    if(FirstReload)
-    getChatsFromUser();
+    if (FirstReload) getChatsFromUser();
   }, [chats]);
 
-  const handleDelete = () => {
-    remove(ref(db,'/users/AdAA5WdQDvgtNlKdYhLRD6tV49f1'))
-
-  }
-
-
   const getChatsFromUser = async () => {
-    setLoading(true)
+    setLoading(true);
     let tempArray = [];
     onValue(ref(db, `/chats`), (snapshot) => {
       const myData = snapshot.val();
@@ -76,8 +76,8 @@ const HomeScreen = () => {
           }
         });
       }
-      setLoading(false)
-      setFirstReload(false)
+      setLoading(false);
+      setFirstReload(false);
     });
     setChats(tempArray);
   };
@@ -91,6 +91,7 @@ const HomeScreen = () => {
       }
     });
   }, [user]);
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -109,7 +110,8 @@ const HomeScreen = () => {
           flexDirection: "column",
         }}
       >
-        <h1>Welcome, {user.email ? (user && email) : (user.displayName)}</h1>
+  
+          <h1>Welcome, {user?.email ? user?.email : user?.displayName}</h1>
         {loading && (
           <Spinner animation="border" role="status">
             <span className="visually-hidden">Loading...</span>
@@ -117,30 +119,37 @@ const HomeScreen = () => {
         )}
         {chats.length > 0 ? (
           <>
-
-        <Title name="MY CHATS" />
-        <List>
-          {chats?.map((chat) => (
-            <>
-            <div key={chat.id}>
-              <ListItem key={chat.id}>
-                <ListItemButton onClick={() => navigate(`/chat/${chat.id}`)}>
-                  <SingleChat
-                    id={chat.id}
-                    dateCreated={chat.dateCreated}
-                    name={chat.name}
-                    members={chat.members}
-                  />
-                </ListItemButton>
-              </ListItem>
-              <Divider sx={{ borderBottomWidth: 3 }} />
-
-            </div>
-            </>
-          ))}
-        </List>
+            <Title name="MY CHATS" />
+            <Card
+              style={{
+                backgroundImage: "linear-gradient(to right, #b3ffd9, #F6F6F6)",
+                padding: 20,
+                borderRadius: 10,
+              }}
+            >
+              <List>
+                {chats?.map((chat) => (
+                  <>
+                    <div key={chat.id}>
+                      <ListItem key={chat.id}>
+                        <ListItemButton
+                          onClick={() => navigate(`/chat/${chat.id}`)}
+                        >
+                          <SingleChat
+                            id={chat.id}
+                            dateCreated={chat.dateCreated}
+                            name={chat.name}
+                            members={chat.members}
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                      <Divider sx={{ borderBottomWidth: 3 }} />
+                    </div>
+                  </>
+                ))}
+              </List>
+            </Card>
           </>
-
         ) : (
           <Title name="You not have chats yet" />
         )}
@@ -151,6 +160,7 @@ const HomeScreen = () => {
         >
           Log out
         </Button2>
+
         <ModalNewChat getChatFromUser={getChatsFromUser} />
       </div>
     </div>

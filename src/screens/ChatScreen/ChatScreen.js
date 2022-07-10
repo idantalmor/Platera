@@ -125,7 +125,7 @@ const ChatScreen = () => {
   return (
     <>
       <div>
-        <Card>
+        <Card style={{border: '1px solid black'}}>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <DetailsChat
               name={currentChat.name}
@@ -146,6 +146,7 @@ const ChatScreen = () => {
               overflow: "hidden",
               overflowY: "scroll",
               flexDirection: "column",
+              border: '1px solid black'
             }}
           >
             <div

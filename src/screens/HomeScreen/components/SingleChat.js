@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 export default function SingleChat({id, dateCreated,name,members}) {
   return (
 
-      <ListItem alignItems="flex-start">
+      <ListItem alignItems="flex-start" style={{border: '1px solid black' ,  backgroundImage: "linear-gradient(to right, #E6F6E1, #F6F6F6)",}}>
         <ListItemAvatar>
           <Avatar alt="Remy Sharp" src="/static/images/avatar/3.jpg" />
         </ListItemAvatar>
@@ -23,6 +23,7 @@ export default function SingleChat({id, dateCreated,name,members}) {
                 component="span"
                 variant="body2"
                 color="text.primary"
+                
               >
                 {members.length} members
               </Typography>
