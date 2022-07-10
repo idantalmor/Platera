@@ -22,7 +22,7 @@ const TitleChat = ({ admin, dateCreated }) => {
         <h6>{dateCreated}</h6>
       </div>
       <div>
-        {uid === admin?.adminId ? <h5>You open the group</h5> : <h5>{admin?.nameAdmin.split("@")[0]} Added you</h5>}
+        {uid === admin?.adminId ? <h5>You open the group</h5> : <h5>{admin?.nameAdmin} Added you</h5>}
       </div>
     </div>
     </>

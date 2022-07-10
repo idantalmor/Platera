@@ -27,28 +27,47 @@ const style = {
 export default function BasicModal({ getChatFromUser }) {
   const { user } = UserAuth();
   const email = user.email;
+  const displayName = user.displayName
   const [nameChat, setNameChat] = useState("");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("");
+
+
   const handleClose = () => {
     setOpen(false);
     setMembers([{ id: user.uid, email: email }]);
     setNameChat("");
     getChatFromUser();
   };
-  const [members, setMembers] = useState([{ id: user.uid, email: email }]);
+  const [members, setMembers] = useState([{ id: user.uid, email: email ? email : user.displayName }]);
   const [data, setData] = useState([]);
   const uuid = uid();
 
   const handleOpen = () => {
     setOpen(true);
   };
-
   useEffect(() => {
     setData([]);
     getAllUsers()
   }, []);
+
+  const checkCurrentUser = (displayName,email) => {
+      if (email){
+        if(email === user.email){
+          return true;
+        }
+      }else{
+        if(displayName){
+          if(displayName === user.displayName){
+            return true
+          }
+        }else{
+          return false;
+        }
+      }
+  }
+
 
   const getAllUsers = () => {
     setLoading(true)
@@ -68,7 +87,11 @@ export default function BasicModal({ getChatFromUser }) {
 
   //Add user to Member array, if exist the function will remove member
   const addToMember = (user) => {
-    const newMember = { id: user.id, email: user.email };
+    const name = user.email
+    if (!name){
+      name = user.displayName
+    }
+    const newMember = { id: user.id, email: name };
     const isFound = members.some((element) => {
       if (element.id === user.id) {
         return true;
@@ -92,7 +115,7 @@ export default function BasicModal({ getChatFromUser }) {
         name: nameChat,
         members: members,
         dateCreated: current,
-        admin: { adminId: user.uid, nameAdmin: user.email },
+        admin: { adminId: user.uid, nameAdmin: user.email ? user.email : user.displayName },
       });
     } catch (error) {
       setError("error");
@@ -127,19 +150,32 @@ export default function BasicModal({ getChatFromUser }) {
             <span className="visually-hidden">Loading...</span>
           </Spinner>
         )}
+        <Box>
+          <div
+            style={{
+              height: "500px",
+              backgroundImage: "linear-gradient(to right, #BABABA, #F3F3F3)",
+              overflow: "hidden",
+              overflowY: "scroll",
+              flexDirection: "column",
+              borderRadius: 20,
+            }}
+          >
           {data?.map((user) => (
-            <div>
+            <div key={user.id}>
               <div style={{ display: "flex", flexDirection: "row" }}>
                 <Checkbox
                   defaultChecked={false}
-                  disabled={email === user.email}
+                  disabled={checkCurrentUser(user.email,user.displayName)}
                   color="success"
                   onClick={() => addToMember(user)}
                 />
-                <h3>{user.email.split("@")[0]}</h3>
+                <h3 style={{ fontSize: "25px", color: "black" }}>{(user.email) ? (user.email.split("@")[0]) : (user.displayName)}</h3>
               </div>
             </div>
           ))}
+          </div>
+        </Box>
           <div
             style={{
               display: "flex",

@@ -10,6 +10,7 @@ import LoginScreen from "./screens/LoginScreen/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen/RegisterScreen";
 import HomeScreen from "./screens/HomeScreen/HomeScreen";
 import ChatScreen from "./screens/ChatScreen/ChatScreen";
+import ErrorScreen from "./screens/ErrorScreen/ErrorScreen";
 import PrivateRoute from "./components/privateRoute";
 import { useState } from "react";
 import { AuthContextProvider } from "./contexts/AuthContext";
@@ -29,6 +30,7 @@ function App() {
                 <Route path="/home" element={<HomeScreen />} />
                 <Route path="/chat/:id" element={<ChatScreen />} />
               </Route>
+              <Route path="*" element={<ErrorScreen/>} />
             </Routes>
           </Container>
         </main>

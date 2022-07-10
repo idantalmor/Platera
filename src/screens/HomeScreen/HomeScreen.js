@@ -17,25 +17,39 @@ const HomeScreen = () => {
   const [chats, setChats] = useState([]);
   const { user, logout } = UserAuth();
   const [loading, setLoading] = useState(false);
-  const uid = user.uid;
+  const [FirstReload,setFirstReload] = useState(true)
+  const uid = user?.uid;
   const navigate = useNavigate();
   const email = user.email;
 
   //Add user to FireStore in firstTime
   const addToDatabase = async () => {
-    await set(ref(db, `/users/${uid}`), {
-      id: uid,
-      email: user.email,
-    });
+    let name = user.email
+    if(!name){
+      name = user.displayName
+    }
+    console.log(uid, name)
+    try {
+      await set(ref(db, `/users/${uid}`), {
+        id: uid,
+        email: name,
+      });
+    } catch (error) {
+      console.log('error')
+      
+    }
   };
   //get all chat of this user
   useEffect(() => {
+    if(FirstReload)
     getChatsFromUser();
   }, [chats]);
 
-  const removeAll = () => {
-    remove(ref(db, `/chats`));
-  };
+  const handleDelete = () => {
+    remove(ref(db,'/users/AdAA5WdQDvgtNlKdYhLRD6tV49f1'))
+
+  }
+
 
   const getChatsFromUser = async () => {
     setLoading(true)
@@ -63,6 +77,7 @@ const HomeScreen = () => {
         });
       }
       setLoading(false)
+      setFirstReload(false)
     });
     setChats(tempArray);
   };
@@ -94,16 +109,20 @@ const HomeScreen = () => {
           flexDirection: "column",
         }}
       >
-        <h1>Welcome, {user && email}</h1>
+        <h1>Welcome, {user.email ? (user && email) : (user.displayName)}</h1>
         {loading && (
           <Spinner animation="border" role="status">
             <span className="visually-hidden">Loading...</span>
           </Spinner>
         )}
+        {chats.length > 0 ? (
+          <>
+
         <Title name="MY CHATS" />
         <List>
           {chats?.map((chat) => (
             <>
+            <div key={chat.id}>
               <ListItem key={chat.id}>
                 <ListItemButton onClick={() => navigate(`/chat/${chat.id}`)}>
                   <SingleChat
@@ -115,18 +134,22 @@ const HomeScreen = () => {
                 </ListItemButton>
               </ListItem>
               <Divider sx={{ borderBottomWidth: 3 }} />
+
+            </div>
             </>
           ))}
         </List>
+          </>
+
+        ) : (
+          <Title name="You not have chats yet" />
+        )}
         <Button2
           onClick={() => handleLogout()}
           variant="contained"
           size={"large"}
         >
           Log out
-        </Button2>
-        <Button2 onClick={() => removeAll()} variant="contained" size={"large"}>
-          remove
         </Button2>
         <ModalNewChat getChatFromUser={getChatsFromUser} />
       </div>

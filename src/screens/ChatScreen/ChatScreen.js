@@ -22,19 +22,14 @@ const ChatScreen = () => {
   const { user } = UserAuth();
   const [currentChat, setCurrentChat] = useState({});
   const [allMessages, setAllMessages] = useState([]);
-  const [numberMessages, setNumberMessages] = useState(0)
+  const [numberMessages, setNumberMessages] = useState(0);
   const [message, setMessage] = useState("");
   const [refresh, setRefresh] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [firstReloadCheck, setFirstReloadCheck] = useState(false);
   const [checkNewMessage, setCheckNewMessage] = useState(false);
 
-
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    } else {
-      getCurrentChat();
-    }
+    getCurrentChat();
   }, [user]);
 
   //Get the details of this chat
@@ -55,39 +50,34 @@ const ChatScreen = () => {
     });
   };
 
-
   useEffect(() => {
     if (refresh) {
-      ReadAllMessages()
+      ReadAllMessages();
     }
-  },[allMessages, refresh]);
+  }, [allMessages, refresh]);
 
   useEffect(() => {
-    setNumberMessages(allMessages.length)
-  })
-  
+    setNumberMessages(allMessages.length);
+  });
 
   useEffect(() => {
-    setRefresh(true)
-  },[numberMessages])
-  
-
+    setRefresh(true);
+  }, [numberMessages]);
 
   const ReadAllMessages = () => {
     let tempArray = [];
-    setAllMessages('')
+    setAllMessages("");
     onValue(ref(db, `/chats/${chatId}/messages`), (snapshot) => {
       const myData = snapshot.val();
-      // console.log(myData)
       if (myData != null) {
         Object.values(myData).map((contact) => {
-          const message = contact
-          tempArray.push(message)
+          const message = contact;
+          tempArray.push(message);
         });
       }
     });
     setAllMessages(tempArray);
-    setRefresh(false)
+    setRefresh(false);
   };
 
   const addToDataBase = async () => {
@@ -106,32 +96,30 @@ const ChatScreen = () => {
     } catch (error) {
       console.log("error");
     }
-    setCheckNewMessage(false)
+    setCheckNewMessage(false);
   };
 
   useEffect(() => {
-    if(checkNewMessage){
-      addToDataBase()
+    if (checkNewMessage) {
+      addToDataBase();
     }
-  }, [allMessages, checkNewMessage])
-  
-
+  }, [allMessages, checkNewMessage]);
 
   const handleUpdateNewMessage = () => {
-    setCheckNewMessage(false)
+    setCheckNewMessage(false);
     const uuid = uid();
     let today = new Date(),
       time =
         today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
     const newMessage = {
       id: uuid,
-      user: { id: user.uid, name: user.email },
+      user: { id: user.uid, name: user.email ? user.email : user.displayName },
       content: message,
       createdAt: time,
     };
     setAllMessages([...allMessages, newMessage]);
     setMessage("");
-    setCheckNewMessage(true)
+    setCheckNewMessage(true);
   };
 
   return (
@@ -172,11 +160,13 @@ const ChatScreen = () => {
               />
             </div>
             {allMessages.map((message) => (
-              <MessageBox
-                text={message.content}
-                user={message.user.name}
-                createdAt={message.createdAt}
-              />
+              <div key={message.id}>
+                <MessageBox
+                  text={message.content}
+                  whoSend={message.user}
+                  createdAt={message.createdAt}
+                />
+              </div>
             ))}
           </div>
         </Box>
@@ -196,26 +186,28 @@ const ChatScreen = () => {
                 setValue={setMessage}
                 style={"chat"}
               />
-              <div
-                style={{
-                  display: "flex",
-                  marginLeft: "2%",
-                  alignItems: "center",
-                }}
-              >
-                <SendIcon
-                  fontSize="large"
-                  color={"primary"}
+              {message.length > 0 && (
+                <div
                   style={{
-                    backgroundColor: "white",
-                    border: "1px solid black",
-                    borderRadius: "5px",
-                    padding: 2,
-                    cursor: "pointer",
+                    display: "flex",
+                    marginLeft: "2%",
+                    alignItems: "center",
                   }}
-                  onClick={handleUpdateNewMessage}
-                />
-              </div>
+                >
+                  <SendIcon
+                    fontSize="large"
+                    color={"primary"}
+                    style={{
+                      backgroundColor: "white",
+                      border: "1px solid black",
+                      borderRadius: "5px",
+                      padding: 2,
+                      cursor: "pointer",
+                    }}
+                    onClick={handleUpdateNewMessage}
+                  />
+                </div>
+              )}
             </div>
           </Box>
         </Card>

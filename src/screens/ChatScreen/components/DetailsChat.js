@@ -11,9 +11,9 @@ const DetailsChat = ({ name, members }) => {
         {members?.map((member, index) => (
           <div key={member.id}>
             {members[index + 1] ? (
-              <h4>{member.email.split("@")[0]} , </h4>
+              <h4>{member.email} , </h4>
             ) : (
-              <h4>{member.email.split("@")[0]}</h4>
+              <h4>{member.email}</h4>
             )}
           </div>
         ))}
