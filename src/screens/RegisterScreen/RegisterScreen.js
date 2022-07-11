@@ -44,12 +44,12 @@ const RegisterScreen = () => {
   return (
     <>
       <Card
-          style={{
-            backgroundImage: "linear-gradient(to right, #BABABA, #F3F3F3)",
-            padding: 20,
-            border: '3px solid black'
-          }}
-        >
+        style={{
+          backgroundImage: "linear-gradient(to right, #BABABA, #F3F3F3)",
+          padding: 20,
+          border: "3px solid black",
+        }}
+      >
         <div>
           <div
             style={{
@@ -65,34 +65,39 @@ const RegisterScreen = () => {
               type={"Email"}
               value={email}
               setValue={setEmail}
-              style={'basic'}
+              style={"basic"}
             />
             <ComposedTextField
               text={"Enter Password"}
               type={"password"}
               value={password}
               setValue={setPassword}
-              style={'basic'}
+              style={"basic"}
             />
             <ComposedTextField
               text={"Password Confirmation"}
               type={"password"}
               value={validPassword}
               setValue={setValidPassword}
-              style={'basic'}
+              style={"basic"}
             />
-            <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
-              <div style={{padding: 10}}>
-            <Button2
-              onClick={() => handleSubmit()}
-              variant="contained"
-              size={"large"}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
             >
-              Sign up Now!
-            </Button2>
+              <div style={{ padding: 10 }}>
+                <Button2
+                  onClick={() => handleSubmit()}
+                  variant="contained"
+                  size={"large"}
+                >
+                  Sign up Now!
+                </Button2>
               </div>
-              <div>
-              </div>
+              <div></div>
             </div>
             {loading && (
               <Spinner animation="border" role="status">

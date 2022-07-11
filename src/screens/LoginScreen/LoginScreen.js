@@ -4,13 +4,12 @@ import Button from "../../components/Button";
 import { Card } from "react-bootstrap";
 import Button2 from "@mui/material/Button";
 import ComposedTextField from "./components/ComposedTextField";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Spinner, Col } from "react-bootstrap";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import { GoogleButton } from "react-google-button";
 import { UserAuth } from "../../contexts/AuthContext";
-import { db } from "../../firebase";
-import { set, ref, onValue, remove } from "firebase/database";
+
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");

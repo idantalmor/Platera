@@ -3,13 +3,12 @@ import Button2 from "@mui/material/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import DetailsChat from "./components/DetailsChat";
 import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField";
 import TitleChat from "./TitleChat";
 import MessageBox from "./components/MessageBox";
 import { Card } from "react-bootstrap";
 import { db } from "../../firebase";
 import { uid } from "uid";
-import { set, ref, onValue, get, getDatabase, update } from "firebase/database";
+import { set, ref, onValue } from "firebase/database";
 import SendIcon from "@mui/icons-material/Send";
 import ComposedTextField from "../LoginScreen/components/ComposedTextField";
 import { UserAuth } from "../../contexts/AuthContext";
@@ -25,9 +24,9 @@ const ChatScreen = () => {
   const [numberMessages, setNumberMessages] = useState(0);
   const [message, setMessage] = useState("");
   const [refresh, setRefresh] = useState(true);
-  const [firstReloadCheck, setFirstReloadCheck] = useState(false);
   const [checkNewMessage, setCheckNewMessage] = useState(false);
 
+  //Get the Details by user
   useEffect(() => {
     getCurrentChat();
   }, [user]);
@@ -50,20 +49,24 @@ const ChatScreen = () => {
     });
   };
 
+  // if the page refresh, (first Loading or sending message) - Read all messages again from DB.
   useEffect(() => {
     if (refresh) {
       ReadAllMessages();
     }
   }, [allMessages, refresh]);
 
+  //Auxiliary variable - Updates the message size to auxiliary variable each time
   useEffect(() => {
     setNumberMessages(allMessages.length);
   });
 
+  //if numberMessages set - set Refresh to true.
   useEffect(() => {
     setRefresh(true);
   }, [numberMessages]);
 
+  // Read all messages from DB to AllMessages
   const ReadAllMessages = () => {
     let tempArray = [];
     setAllMessages("");
@@ -80,6 +83,13 @@ const ChatScreen = () => {
     setRefresh(false);
   };
 
+  useEffect(() => {
+    if (checkNewMessage) {
+      addToDataBase();
+    }
+  }, [allMessages, checkNewMessage]);
+
+  // add new message to database.
   const addToDataBase = async () => {
     try {
       await set(ref(db, `/chats/${chatId}`), {
@@ -98,12 +108,6 @@ const ChatScreen = () => {
     }
     setCheckNewMessage(false);
   };
-
-  useEffect(() => {
-    if (checkNewMessage) {
-      addToDataBase();
-    }
-  }, [allMessages, checkNewMessage]);
 
   const handleUpdateNewMessage = () => {
     setCheckNewMessage(false);
@@ -125,7 +129,7 @@ const ChatScreen = () => {
   return (
     <>
       <div>
-        <Card style={{border: '1px solid black'}}>
+        <Card style={{ border: "1px solid black" }}>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <DetailsChat
               name={currentChat.name}
@@ -146,7 +150,7 @@ const ChatScreen = () => {
               overflow: "hidden",
               overflowY: "scroll",
               flexDirection: "column",
-              border: '1px solid black'
+              border: "1px solid black",
             }}
           >
             <div
@@ -179,7 +183,6 @@ const ChatScreen = () => {
             }}
           >
             <div style={{ display: "flex", flexDirection: "row" }}>
-              {/* <TextField fullWidth label="enter a Message" id="fullWidth" /> */}
               <ComposedTextField
                 text={"Enter new Message"}
                 type={"Email"}

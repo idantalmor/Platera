@@ -20,7 +20,6 @@ const HomeScreen = () => {
   const [FirstReload, setFirstReload] = useState(true);
   const uid = user?.uid;
   const navigate = useNavigate();
-  console.log(user);
 
   //Add user to FireStore in firstTime
   const addToDatabase = async () => {
@@ -28,29 +27,27 @@ const HomeScreen = () => {
     if (!name) {
       name = user?.displayName;
     }
-    console.log(uid, name);
     try {
       await set(ref(db, `/users/${uid}`), {
         id: uid,
         email: name,
       });
-    } catch (error) {
-      console.log("error");
-    }
+    } catch (error) {}
   };
 
+  //check navigate to login if user is null
   useEffect(() => {
-    if(user === null){
-      navigate('/login')
-     }
-  }, [user])
-  
+    if (user === null) {
+      navigate("/login");
+    }
+  }, [user]);
 
   //get all chat of this user
   useEffect(() => {
     if (FirstReload) getChatsFromUser();
   }, [chats]);
 
+  //return the chats from the user
   const getChatsFromUser = async () => {
     setLoading(true);
     let tempArray = [];
@@ -71,7 +68,6 @@ const HomeScreen = () => {
               members: contact.members,
               name: contact.name,
             };
-            // setChats((oldArray) => [...oldArray, newChat]);
             tempArray.push(newChat);
           }
         });
@@ -110,8 +106,7 @@ const HomeScreen = () => {
           flexDirection: "column",
         }}
       >
-  
-          <h1>Welcome, {user?.email ? user?.email : user?.displayName}</h1>
+        <h1>Welcome, {user?.email ? user?.email : user?.displayName}</h1>
         {loading && (
           <Spinner animation="border" role="status">
             <span className="visually-hidden">Loading...</span>

@@ -1,9 +1,16 @@
 import React from "react";
-import Button from "../../components/Button"
+import Button from "../../components/Button";
 
 const ErrorScreen = () => {
   return (
-    <div style={{ display: "flex", justifyContent: "center", flexDirection:'column', alignItems:'center' }}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
       <div>
         <h5>Oops...</h5>
       </div>

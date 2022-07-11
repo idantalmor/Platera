@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import { UserAuth } from "../../../contexts/AuthContext";
 import { db } from "../../../firebase";
 import { uid } from "uid";
-import { set, ref, onValue, get, getDatabase } from "firebase/database";
+import { set, ref, onValue } from "firebase/database";
 import ComposedTextField from "../../LoginScreen/components/ComposedTextField";
 import { Spinner } from "react-bootstrap";
 
@@ -22,7 +22,7 @@ const style = {
   border: "2px solid #000",
   boxShadow: 24,
   p: 4,
-  borderRadius:10
+  borderRadius: 10,
 };
 
 export default function BasicModal({ getChatFromUser }) {
@@ -30,9 +30,14 @@ export default function BasicModal({ getChatFromUser }) {
   const email = user?.email;
   const [nameChat, setNameChat] = useState("");
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [members, setMembers] = useState([
+    { id: user?.uid, email: email ? email : user?.displayName },
+  ]);
+  const [data, setData] = useState([]);
+  const uuid = uid();
 
   const handleClose = () => {
     setOpen(false);
@@ -40,65 +45,35 @@ export default function BasicModal({ getChatFromUser }) {
     setNameChat("");
     getChatFromUser();
   };
-  const [members, setMembers] = useState([{ id: user?.uid, email: email ? email : user?.displayName }]);
-  const [data, setData] = useState([]);
-  const uuid = uid();
 
-  const handleOpen = () => {
-    setOpen(true);
-  };
   useEffect(() => {
     setData([]);
-    getAllUsers()
+    getAllUsers();
   }, []);
 
-  const checkCurrentUser = (displayName,email) => {
-    console.log(email)
-      if (email){
-        if(email === user.email){
-          return true;
-        }
-      }else{
-        if(displayName){
-          if(displayName === user.displayName){
-            return true
-          }
-        }else{
-          return false;
-        }
-      }
-  }
-
-  // useEffect(() => {
-    
-  // }, [data])
-  
-
-
+  //get All the users from database and put in Data
   const getAllUsers = () => {
-    setLoading(true)
-    let tempArray = []
+    setLoading(true);
+    let tempArray = [];
     onValue(ref(db, `/users`), (snapshot) => {
       const myData = snapshot.val();
       if (myData != null) {
         Object.values(myData).map((contact) => {
           const user = { id: contact.id, email: contact.email };
-          tempArray.push(user)
+          tempArray.push(user);
         });
-        console.log(tempArray)
       }
-      tempArray.sort((a, b) => (a.email > b.email) ? 1 : -1)
-      console.log(tempArray)
+      tempArray.sort((a, b) => (a.email > b.email ? 1 : -1));
     });
-    setLoading(false)
+    setLoading(false);
     setData(tempArray);
   };
 
   //Add user to Member array, if exist the function will remove member
   const addToMember = (user) => {
-    const name = user.email
-    if (!name){
-      name = user.displayName
+    const name = user.email;
+    if (!name) {
+      name = user.displayName;
     }
     const newMember = { id: user.id, email: name };
     const isFound = members.some((element) => {
@@ -124,7 +99,10 @@ export default function BasicModal({ getChatFromUser }) {
         name: nameChat,
         members: members,
         dateCreated: current,
-        admin: { adminId: user.uid, nameAdmin: user.email ? user.email : user.displayName },
+        admin: {
+          adminId: user.uid,
+          nameAdmin: user.email ? user.email : user.displayName,
+        },
       });
     } catch (error) {
       setError("error");
@@ -132,11 +110,9 @@ export default function BasicModal({ getChatFromUser }) {
     handleClose();
   };
 
-
-
   return (
     <div>
-      <Button onClick={handleOpen}>Create New Chat</Button>
+      <Button onClick={() => setOpen(true)}>Create New Chat</Button>
       <Modal
         open={open}
         aria-labelledby="modal-modal-title"
@@ -150,44 +126,51 @@ export default function BasicModal({ getChatFromUser }) {
             text={"Enter Name Group"}
             value={nameChat}
             setValue={setNameChat}
-            style={'basic'}
+            style={"basic"}
           />
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             Who to join the chat with?
           </Typography>
           {loading && (
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
-        )}
-        <Box>
-          <div
-            style={{
-              height: "500px",
-              backgroundImage: "linear-gradient(to right, #BABABA, #F3F3F3)",
-              overflow: "hidden",
-              overflowY: "scroll",
-              flexDirection: "column",
-              borderRadius: 20,
-              padding: 10,
-            }}
-          >
-          {data?.map((currentUser) => (
-            <div key={currentUser.id}>
-              <div style={{ display: "flex", flexDirection: "row" }}>
-
-                <Checkbox
-                  defaultChecked={false}
-                  disabled={user?.email ? (currentUser.email === user?.email) : (currentUser.email === user?.displayName)}
-                  color="success"
-                  onClick={() => addToMember(currentUser)}
-                />
-                <h3 style={{ fontSize: "25px", color: "black" }}>{(currentUser.email) ? (currentUser.email.split("@")[0]) : (user.displayName)}</h3>
-              </div>
+            <Spinner animation="border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </Spinner>
+          )}
+          <Box>
+            <div
+              style={{
+                height: "500px",
+                backgroundImage: "linear-gradient(to right, #BABABA, #F3F3F3)",
+                overflow: "hidden",
+                overflowY: "scroll",
+                flexDirection: "column",
+                borderRadius: 20,
+                padding: 10,
+              }}
+            >
+              {data?.map((currentUser) => (
+                <div key={currentUser.id}>
+                  <div style={{ display: "flex", flexDirection: "row" }}>
+                    <Checkbox
+                      defaultChecked={false}
+                      disabled={
+                        user?.email
+                          ? currentUser.email === user?.email
+                          : currentUser.email === user?.displayName
+                      }
+                      color="success"
+                      onClick={() => addToMember(currentUser)}
+                    />
+                    <h3 style={{ fontSize: "25px", color: "black" }}>
+                      {currentUser.email
+                        ? currentUser.email.split("@")[0]
+                        : user.displayName}
+                    </h3>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-          </div>
-        </Box>
+          </Box>
           <div
             style={{
               display: "flex",
@@ -206,7 +189,9 @@ export default function BasicModal({ getChatFromUser }) {
           >
             <Button onClick={handleClose}>Cancel</Button>
             <div>
-              <Button onClick={HandleNewChat} disabled={nameChat.length < 3}>Create Chat</Button>
+              <Button onClick={HandleNewChat} disabled={nameChat.length < 3}>
+                Create Chat
+              </Button>
               {error && <h3>{error}</h3>}
             </div>
           </div>
